@@ -1,0 +1,19 @@
+{
+  "name": "lcmodule",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --watch"
+  },
+  "author": "Grégory Lecomte <gregory.lecnet@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.1.1",
+    "jest": "^28.0.0",
+    "ts-jest": "^28.0.8",
+    "typescript": "^4.8.2"
+  }
+}
