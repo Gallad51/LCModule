@@ -1,0 +1,7 @@
+node_modules
+*.ts
+tests
+coverage
+jest.config.js
+tsconfig.js
+!*.d.ts

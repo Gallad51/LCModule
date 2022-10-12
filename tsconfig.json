@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "declaration": true,
-    "outDir": "./lib",
+    "lib": ["es2022"],
+    "module": "commonjs",
+    "target": "es2022",
     "strict": true,
-    "sourceMap": true,
-    "esModuleInterop": false,
-    "moduleResolution": "node"
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "lib",
+    "declaration": true
   },
   "baseUrl": "src",
   "include": ["src"],

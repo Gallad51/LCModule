@@ -48,11 +48,12 @@ export default class LCModule implements IModule {
     }
 
     install() : void {
-        this._isInstalled = true
+        this.getLogger().info(`Installing module ${this.getName()}`)
         this._registryInvoker.checkRequirements()
         this.getModuleTree().getInnerModules().forEach((innerMod: IModule) => {
             innerMod.install()
         })
+        this._isInstalled = true
     }
 
     isInstalled() : boolean {
