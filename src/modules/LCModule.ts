@@ -1,6 +1,7 @@
 import IInvokerRegistry from "../core/IInvokerRegistry"
 import ILogger from "../core/ILogger"
 import IModule from "../core/IModules"
+import IModuleTree from "../core/IModuleTree"
 import ModuleInvokerRegistry from "../core/ModuleInvokerRegistry"
 import ModuleTree from "../core/ModuleTree"
 
@@ -14,17 +15,22 @@ const defaultLogger: ILogger = {
 
 export default class LCModule implements IModule {
     _moduleName: string
-    _tree: ModuleTree
+    _tree: IModuleTree<IModule>
     _registryInvoker: IInvokerRegistry
     _isInstalled: boolean = false
     _state: any
     _logger: ILogger | undefined
 
-    constructor(name: string) {
+    constructor(name: string, components?: {
+        tree?: IModuleTree<IModule>,
+        registryInvoker?: IInvokerRegistry
+    }) {
         this._moduleName = name
-        this._tree = new ModuleTree(this)
-        this._registryInvoker = new ModuleInvokerRegistry(this)
+        this._tree = components?.tree || new ModuleTree()
+        this._registryInvoker = components?.registryInvoker || new ModuleInvokerRegistry(this)
         this._state = {}
+
+        this.getModuleTree().setCurrentModule(this)
     }
 
     getLogger(): ILogger {
@@ -33,6 +39,9 @@ export default class LCModule implements IModule {
 
     setLogger(logger: ILogger) {
         this._logger = logger
+        this.getModuleTree().getInnerModules().forEach((innerMod: IModule) => {
+            innerMod.setLogger(logger)
+        })
     }
 
     getRegistryInvoker(): IInvokerRegistry {
@@ -43,7 +52,7 @@ export default class LCModule implements IModule {
         return this._moduleName
     }
 
-    getModuleTree() : ModuleTree {
+    getModuleTree() : IModuleTree<IModule> {
         return this._tree
     }
 

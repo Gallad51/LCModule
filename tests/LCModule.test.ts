@@ -336,4 +336,43 @@ describe('Module should handle a logger', () => {
         module.getLogger().warn('test Logging')
         module.getLogger().crit('test Logging')
     })
+
+    test('Module Logging should propagate to inner modules', () => {
+        let called = 0
+        const logger = {
+            info(message: string, data: any) { called++ },
+            warn(message: string, data: any) { called++ },
+            error(message: string, data: any) { called++ },
+            debug(message: string, data: any) { called++ },
+            crit(message: string, data: any) { called++ }
+        }
+
+        const module : IModule = new LCModule('root')
+        const mod1 : IModule = new LCModule('mod1')
+        module.getModuleTree().addInnerModule(mod1)
+
+        module.setLogger(logger)
+        
+        mod1.getLogger().info('test Logging')
+        expect(called).toBeGreaterThan(0)
+    })
+
+    test('Module Logging should propagate to independant modules', () => {
+        let called = 0
+        const logger = {
+            info(message: string, data: any) { called++ },
+            warn(message: string, data: any) { called++ },
+            error(message: string, data: any) { called++ },
+            debug(message: string, data: any) { called++ },
+            crit(message: string, data: any) { called++ }
+        }
+
+        const module : IModule = new LCModule('root')
+        const mod1 : IModule = new LCModule('mod1')
+
+        module.setLogger(logger)
+        
+        mod1.getLogger().info('test Logging')
+        expect(called).toBe(0)
+    })
 })

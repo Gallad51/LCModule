@@ -1,10 +1,10 @@
 import IInvokerRegistry from "./IInvokerRegistry"
 import ILogger from "./ILogger"
-import ModuleTree from "./ModuleTree"
+import IModuleTree from "./IModuleTree"
 
 export default interface IModule {
     getName() : string
-    getModuleTree() : ModuleTree
+    getModuleTree() : IModuleTree<IModule>
     getRegistryInvoker() : IInvokerRegistry
     install() : void
     isInstalled() : boolean
