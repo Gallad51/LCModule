@@ -1,10 +1,9 @@
 {
   "name": "lcmodule",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "description": "",
   "main": "./lib/index.js",
   "types": "./types/index.d.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "jest --watch"

@@ -20,7 +20,7 @@ export default class ModuleInvokerRegistry implements IInvokerRegistry {
         return this._methods.find((method: ModuleMethod) => method._name === methodName )
     }
 
-    invoke(methodPath: string, param?: any | undefined) : any {
+    async invoke(methodPath: string, param?: any | undefined) : Promise<any> {
         const splittedPath = methodPath.split(':')
         if (splittedPath.length > 1) {
             let expectedModule = this._module.getModuleTree().getRootModule().getModuleTree().findInnerModule(splittedPath.slice(0, -1))
@@ -49,9 +49,9 @@ export default class ModuleInvokerRegistry implements IInvokerRegistry {
         }
     }
 
-    invokeWithFormatter(methodPath: string, formatter: any, param?: any | undefined) : any {
+    async invokeWithFormatter(methodPath: string, formatter: any, param?: any | undefined) : Promise<any> {
         if (formatter) {
-            return formatter(this.invoke(methodPath, param))
+            return formatter(await this.invoke(methodPath, param))
         } else {
             return this.invoke(methodPath, param)
         }

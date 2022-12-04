@@ -115,39 +115,39 @@ describe('Module initialisation', () => {
 
 describe('Modules can expose and invoke methods', () => {
     describe('Modules Can expose methods', () => {
-        test('Method registered should be accessable through ID', () => {
+        test('Method registered should be accessable through ID', async () => {
             function getZero () {
                 return 0
             }
             const mod = new LCModule('root')
             mod.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod.getRegistryInvoker().invoke('getZero')).toBe(0)
+            expect(await mod.getRegistryInvoker().invoke('getZero')).toBe(0)
         })
 
-        test('Method invoking with parameters', () => {
+        test('Method invoking with parameters', async () => {
             function getNumber(value: number) {
                 return value
             }
             const mod = new LCModule('root')
             mod.getRegistryInvoker().register(getNumber.name, getNumber)
             mod.install()
-            expect(mod.getRegistryInvoker().invoke('getNumber', 10)).toBe(10)
+            expect(await mod.getRegistryInvoker().invoke('getNumber', 10)).toBe(10)
         })
 
-        test('Invoking method that doesn\'t exist should failed', () => {
+        test('Invoking method that doesn\'t exist should failed', async () => {
             function getNumber(value: number) {
                 return value
             }
             const mod = new LCModule('root')
             mod.getRegistryInvoker().register(getNumber.name, getNumber)
             mod.install()
-            expect(mod.getRegistryInvoker().invoke('getNumbers', 10)).toBe(undefined)
+            expect(await mod.getRegistryInvoker().invoke('getNumbers', 10)).toBe(undefined)
         })
     })
 
     describe('Method registered in another module of the tree should be available', () => {
-        test('Method registered should be accessable through ID', () => {
+        test('Method registered should be accessable through ID', async () => {
             function getZero () {
                 return 0
             }
@@ -158,10 +158,10 @@ describe('Modules can expose and invoke methods', () => {
             mod.getModuleTree().addInnerModule(mod2)
             mod1.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod2.getRegistryInvoker().invoke('mod1:getZero')).toBe(0)
+            expect(await mod2.getRegistryInvoker().invoke('mod1:getZero')).toBe(0)
         })
 
-        test('Method registered should be accessable through ID with deep tree', () => {
+        test('Method registered should be accessable through ID with deep tree', async () => {
             function getZero () {
                 return 0
             }
@@ -179,11 +179,11 @@ describe('Modules can expose and invoke methods', () => {
             mod5.getRegistryInvoker().register(getZero.name, getZero)
             mod3.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod1.getRegistryInvoker().invoke('mod2:mod3:mod4:mod5:getZero')).toBe(0)
-            expect(mod1.getRegistryInvoker().invoke('mod2:mod3:getZero')).toBe(0)
+            expect(await mod1.getRegistryInvoker().invoke('mod2:mod3:mod4:mod5:getZero')).toBe(0)
+            expect(await mod1.getRegistryInvoker().invoke('mod2:mod3:getZero')).toBe(0)
         })
 
-        test('Method registered should be accessable without full-chain', () => {
+        test('Method registered should be accessable without full-chain', async () => {
             function getZero () {
                 return 0
             }
@@ -201,11 +201,11 @@ describe('Modules can expose and invoke methods', () => {
             mod5.getRegistryInvoker().register(getZero.name, getZero)
             mod3.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod1.getRegistryInvoker().invoke('mod5:getZero')).toBe(0)
-            expect(mod1.getRegistryInvoker().invoke('mod3:getZero')).toBe(0)
+            expect(await mod1.getRegistryInvoker().invoke('mod5:getZero')).toBe(0)
+            expect(await mod1.getRegistryInvoker().invoke('mod3:getZero')).toBe(0)
         })
 
-        test('Expect invoke on non-existing method to fail', () => {
+        test('Expect invoke on non-existing method to fail', async () => {
             function getZero () {
                 return 0
             }
@@ -216,10 +216,10 @@ describe('Modules can expose and invoke methods', () => {
             mod.getModuleTree().addInnerModule(mod2)
             mod1.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod2.getRegistryInvoker().invoke('mod1:getOne')).toBe(undefined)
+            expect(await mod2.getRegistryInvoker().invoke('mod1:getOne')).toBe(undefined)
         })
 
-        test('Expect invoke on non-existing module to fail', () => {
+        test('Expect invoke on non-existing module to fail', async () => {
             function getZero () {
                 return 0
             }
@@ -230,7 +230,7 @@ describe('Modules can expose and invoke methods', () => {
             mod.getModuleTree().addInnerModule(mod2)
             mod1.getRegistryInvoker().register(getZero.name, getZero)
             mod.install()
-            expect(mod2.getRegistryInvoker().invoke('mod3:getOne')).toBe(undefined)
+            expect(await mod2.getRegistryInvoker().invoke('mod3:getOne')).toBe(undefined)
         })
     })
 
@@ -241,53 +241,53 @@ describe('Modules can expose and invoke methods', () => {
             expect(() => { mod.install() }).toThrow()
         })
 
-        test('Install can pursue if required method is invoked beforehand', () => {
+        test('Install can pursue if required method is invoked beforehand', async () => {
             const mod: IModule = new LCModule('root')
             mod.getRegistryInvoker().register('getZero', () => 0, { installRequired: true })
-            mod.getRegistryInvoker().invoke('getZero')
+            await mod.getRegistryInvoker().invoke('getZero')
             mod.install()
             expect(mod.isInstalled()).toBe(true)
         })
 
-        test('Method defaulty require installation to be Invoke if not installRequired', () => {
+        test('Method defaulty require installation to be Invoke if not installRequired', async () => {
             const mod: IModule = new LCModule('root')
-            mod.getRegistryInvoker().register('getZero', () => 0)
-            expect(() => { mod.getRegistryInvoker().invoke('getZero') }).toThrow()
+            mod.getRegistryInvoker().register('getZero', async () => 0)
+            await expect(mod.getRegistryInvoker().invoke('getZero')).rejects.toThrow()
         })
 
-        test('Method should be allowed to be invoked before install if specified', () => {
+        test('Method should be allowed to be invoked before install if specified', async () => {
             const mod: IModule = new LCModule('root')
             mod.getRegistryInvoker().register('getZero', () => 0, { allowBeforeInstall: true })
-            expect(mod.getRegistryInvoker().invoke('getZero')).toBe(0)
+            expect(await mod.getRegistryInvoker().invoke('getZero')).toBe(0)
         })
     })
 
     describe('Method should be able to use a formatter', () => {
-        test('Method with a basic formatter', () => {
+        test('Method with a basic formatter', async () => {
             const module = new LCModule('root')
             module.getRegistryInvoker().register('getData', () => {
                 return [0, 1, 2, 3, 4, 5]
             })
             module.install()
-            expect(module.getRegistryInvoker().invokeWithFormatter('getData', (res:Array<number>) => res.map((e:number) => e + 1))).toStrictEqual([1, 2, 3, 4, 5, 6])
+            expect(await module.getRegistryInvoker().invokeWithFormatter('getData', (res:Array<number>) => res.map((e:number) => e + 1))).toStrictEqual([1, 2, 3, 4, 5, 6])
         })
 
-        test('Method with null formatter', () => {
+        test('Method with null formatter', async () => {
             const module = new LCModule('root')
             module.getRegistryInvoker().register('getData', () => {
                 return [0, 1, 2, 3, 4, 5]
             })
             module.install()
-            expect(module.getRegistryInvoker().invokeWithFormatter('getData', null)).toStrictEqual([0, 1, 2, 3, 4, 5])
+            expect( await module.getRegistryInvoker().invokeWithFormatter('getData', null)).toStrictEqual([0, 1, 2, 3, 4, 5])
         })
 
-        test('Method with a basic formatter and a param', () => {
+        test('Method with a basic formatter and a param', async () => {
             const module = new LCModule('root')
             module.getRegistryInvoker().register('getData', (start:number) => {
                 return [start, start +1, start+2, start+3, start+4, start+5]
             })
             module.install()
-            expect(module.getRegistryInvoker().invokeWithFormatter('getData', (res:Array<number>) => res.map((e:number) => e.toString()), 5)).toStrictEqual(['5', '6', '7', '8', '9', '10'])
+            expect(await module.getRegistryInvoker().invokeWithFormatter('getData', (res:Array<number>) => res.map((e:number) => e.toString()), 5)).toStrictEqual(['5', '6', '7', '8', '9', '10'])
         })
     })
 })
